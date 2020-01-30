@@ -2,11 +2,6 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-const util = require("util");
-
-const readFileAsync = util.promisify(fs.readFile);
-const writeFileAsync = util.promisify(fs.writeFile);
-const appendFileAsync = util.promisify(fs.appendFile);
 
 // -----------------------------------------------------
 // Express app
@@ -46,7 +41,6 @@ app.get("/api/notes", function(req, res) {
 
 app.post("/api/notes", function(req, res) {
   const newNote = req.body;
-  console.log(newNote);
   let maxID = 0;
   for (const note of database) {
     let currentID = note.id;
@@ -55,12 +49,42 @@ app.post("/api/notes", function(req, res) {
     }
   }
   newNote.id = maxID + 1;
-  console.log(newNote);
-  database.push(newNote);
-  res.json(newNote);
+  let tempDatabase = database;
+  tempDatabase.push(newNote);
+  fs.writeFile("./Develop/db/db.json", JSON.stringify(tempDatabase), err => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("Added new note to db.json.");
+      console.log(database);
+      res.json(newNote);
+    }
+  });
 });
 
-// DELETE `/api/notes/:id` - Should recieve a query paramter containing the id of a note to delete. This means you'll need to find a way to give each note a unique `id` when it's saved. In order to delete a note, you'll need to read all notes from the `db.json` file, remove the note with the given `id` property, and then rewrite the notes to the `db.json` file
+// DELETE `/api/notes/:id`
+
+app.delete("/api/notes/:id", function(req, res) {
+  // Receive a query parameter containing the id of a note to delete
+  const chosenID = req.params.id;
+  // Read all notes from the 'db.json' file and remove the note with the given 'id' property
+  let tempDB = database;
+  for (let i = 0; i < tempDB.length; i++) {
+    if (chosenID === tempDB[i].id.toString()) {
+      tempDB.splice(i, 1);
+    }
+  }
+  // Rewrite the notes to the 'db.json' file
+  fs.writeFile("./Develop/db/db.json", JSON.stringify(tempDB), err => {
+    if (err) {
+      res.sendStatus(500);
+    } else {
+      console.log(`Deleted id # ${chosenID} from the database.`);
+      console.log(database);
+      res.sendStatus(200);
+    }
+  });
+});
 
 // -----------------------------------------------------
 // Listener
