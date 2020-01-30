@@ -1,10 +1,10 @@
 # Note-Taker
 
-Deployed at XXX.
+Deployed at https://boiling-depths-17138.herokuapp.com/
 
 ## Description
 
-An application that writes, saves, and deletes notes using an Express backend. Can be used for digital to do lists, reminders, and other information storage.
+An application that writes, saves, and deletes notes using an Express backend. Can be used for digital to do lists, shopping lists, reminders, and other information storage.
 
 | Technologies used            |
 | ---------------------------- |
